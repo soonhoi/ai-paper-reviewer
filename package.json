@@ -1,0 +1,84 @@
+{
+  "name": "paper-agent",
+  "version": "1.0.0",
+  "description": "Evidence-based desktop academic paper reviewer",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "cli": "node src/index.js",
+    "dev": "node scripts/desktop.js dev",
+    "build": "node scripts/desktop.js build",
+    "preview": "astro preview",
+    "test": "node --test test/*.test.js",
+    "electron": "node scripts/desktop.js electron",
+    "dist:win": "npm run build && electron-builder --win nsis --x64",
+    "web:dev": "astro dev",
+    "web:build": "astro build",
+    "web:preview": "astro preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "dotenv": "^18.0.7",
+    "fontkit": "^2.0.4",
+    "openai": "^7.32.0",
+    "pdf-parse": "^2.4.5",
+    "pdfkit": "^0.20.2"
+  },
+  "devDependencies": {
+    "@astrojs/node": "^11.1.7",
+    "astro": "^7.3.8",
+    "electron": "^44.7.0",
+    "electron-builder": "^26.15.3"
+  },
+  "productName": "AI Paper Reviewer",
+  "build": {
+    "appId": "org.paperagent.reviewer",
+    "productName": "AI Paper Reviewer",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/**",
+      "src/**",
+      "dist-desktop/**",
+      "package.json",
+      "!src/pages/**",
+      "!src/client/**",
+      "!**/.env",
+      "!**/.env.*",
+      "!work/**",
+      "!output/**",
+      "!papers/**",
+      "!test/**"
+    ],
+    "asarUnpack": [
+      "**/*.node",
+      "node_modules/pdf-parse/**",
+      "node_modules/@napi-rs/**"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "AI Paper Reviewer Setup ${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "AI Paper Reviewer"
+    },
+    "npmRebuild": false,
+    "electronDist": "node_modules/electron/dist"
+  }
+}

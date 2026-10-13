@@ -1,0 +1,71 @@
+---
+const steps = ["PDF 읽기", "논문 인덱스 생성", "논문 요약", "Critical Review", "Author Advocate", "Debate", "Final Evaluation"];
+const ids = ["pdf", "index", "summary", "review", "advocate", "debate", "final"];
+---
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="논문의 기여와 근거를 검토하는 AI Paper Reviewer" />
+    <title>AI Paper Reviewer</title>
+  </head>
+  <body>
+    <header class="top"><a href="/" class="brand"><span class="mark">PR</span> AI Paper Reviewer</a><span class="tag">RESEARCH · EVIDENCE · REVIEW</span></header>
+    <main>
+      <section class="hero">
+        <p class="eyebrow">A SECOND PERSPECTIVE ON YOUR RESEARCH</p>
+        <h1>논문의 가치를,<br /><em>근거를 따라</em> 검토합니다.</h1>
+        <p class="intro">논문 PDF를 업로드하면 AI가 요약하고, 비판과 반론을 검토하고,<br class="desktop" /> 주요 쟁점에 대한 토론을 거쳐 최종 학술 평가를 제공합니다.</p>
+      </section>
+      <section class="workspace">
+        <form id="review-form" class="panel" enctype="multipart/form-data">
+          <div class="section-head"><h2>논문 리뷰 시작</h2><span>01 — UPLOAD</span></div>
+          <label id="dropzone" class="dropzone" for="file">
+            <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M12 18v-7m-3 3 3-3 3 3" /></svg>
+            <strong>PDF 파일을 끌어 놓거나 선택하세요</strong>
+            <span>학술 논문 · PDF · 최대 20 MB</span>
+            <input id="file" name="file" type="file" accept=".pdf,application/pdf" aria-label="논문 PDF 선택" />
+          </label>
+          <p id="filename" class="filename">선택된 파일 없음</p>
+          <div id="desktop-controls" hidden>
+            <button id="select-pdf" type="button" class="secondary">PDF 파일 선택</button>
+            <label class="field-label" for="api-key">OpenAI API Key</label>
+            <input id="api-key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-••••••••••••••••••" />
+            <label class="remember"><input id="remember-key" type="checkbox" /> 이 PC에 API Key 저장</label>
+            <p id="key-status" class="hint" role="status"></p>
+            <button id="delete-key" type="button" class="secondary">저장된 API Key 삭제</button>
+            <button id="clear-data" type="button" class="secondary">작업 데이터 삭제</button>
+            <p class="privacy">선택한 논문은 이 PC에서 처리됩니다. AI 분석에 필요한 텍스트는 OpenAI API로 전송될 수 있습니다. 논문의 공개 여부 및 사용 권한을 확인해 주세요.</p>
+          </div>
+          <label class="field-label" for="language">리뷰 출력 언어</label>
+          <select id="language" name="language"><option value="ko">한국어</option><option value="en">English</option></select>
+          <button id="submit" type="submit">논문 리뷰 시작 <span aria-hidden="true">→</span></button>
+          <p class="hint">논문 길이와 AI 응답 시간에 따라 수 분이 걸릴 수 있습니다.</p>
+          <p id="error" class="error" role="alert" hidden></p>
+        </form>
+        <aside class="panel process">
+          <div class="section-head"><h2>검토 과정</h2><span>02 — PIPELINE</span></div>
+          <p class="muted">하나의 Reviewer가 통합 평가하고, 저자 관점의 반론과 근거를 함께 검토합니다.</p>
+          <ol id="progress">{steps.map((step, i) => <li data-stage={ids[i]}><span class="step-dot">{String(i + 1).padStart(2, "0")}</span><span>{step}</span><span class="step-state">대기</span></li>)}</ol>
+          <p id="status" role="status" aria-live="polite" class="status">PDF를 선택하면 검토를 시작할 수 있습니다.</p>
+        </aside>
+      </section>
+      <section id="results" hidden aria-label="논문 리뷰 결과">
+        <div class="result-head"><div><p class="eyebrow">FINAL PAPER REVIEW</p><h2 id="paper-title"></h2></div><div class="downloads"><button id="download-final" type="button" class="secondary">Final JSON ↓</button><button id="download-full" type="button" class="secondary">Full JSON ↓</button><button id="save-pdf" type="button" class="secondary" disabled hidden>PDF 보고서 저장</button></div></div>
+        <div class="metrics"><div><span>Verdict</span><strong id="verdict"></strong></div><div><span>Overall Score</span><strong id="overall"></strong></div><div><span>Confidence</span><strong id="confidence"></strong></div></div>
+        <div id="final-cards" class="cards"></div>
+        <div class="section-head intermediates"><h2>검토 기록</h2><span>AGENT REPORTS</span></div>
+        <div id="agent-reports"></div>
+      </section>
+      <footer>AI Paper Reviewer <span>AI 평가는 연구 검토를 돕는 보조 자료입니다.</span></footer>
+    </main>
+    <script>
+      import "../client/review.js";
+    </script>
+  </body>
+</html>
+<style is:global>
+  #select-pdf{margin-bottom:20px;width:100%}#api-key{width:100%;padding:12px;border:1px solid #dce2db;border-radius:6px;margin-bottom:12px}.remember{font-size:12px;display:flex;align-items:center;gap:7px;margin-bottom:12px}#delete-key,#clear-data{margin:10px 5px 0 0}.privacy{font-size:11px;line-height:1.8;color:#6f7d72;margin:18px 0 22px}.process li.failed .step-dot{background:#f9e5df;color:#993a29}.process li.failed .step-state{color:#993a29}
+  :root{font-family:Inter,"Segoe UI","Malgun Gothic",sans-serif;color:#20302e;background:#f5f6f2;font-synthesis:none}*{box-sizing:border-box}body{margin:0}button,input,select{font:inherit}button,a,select,input{outline-offset:5px}button{cursor:pointer}button:disabled{opacity:.65;cursor:wait}a{color:inherit;text-decoration:none}[hidden]{display:none!important}.top{max-width:1260px;margin:auto;padding:28px 36px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #dce2db}.brand{font-weight:650;display:flex;align-items:center;gap:12px}.mark{background:#244d42;color:white;border-radius:7px;padding:8px;font-size:13px;letter-spacing:1px}.tag{font-size:10px;letter-spacing:2px;color:#76837d}main{max-width:1150px;margin:auto;padding:0 32px}.hero{padding:65px 0 42px}.eyebrow{font-size:10px;color:#456d5e;letter-spacing:2px;font-weight:700;margin:0 0 20px}h1{font-size:clamp(32px,4vw,49px);letter-spacing:-2px;line-height:1.4;font-weight:650;margin:0 0 22px}h1 em{font-style:normal;color:#456d5e}.intro{font-size:15px;line-height:1.9;color:#69766e}.workspace{display:grid;grid-template-columns:1.12fr 1fr;gap:24px}.panel{background:white;border:1px solid #dce2db;border-radius:12px;padding:28px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:22px}h2{font-size:18px;margin:0;line-height:1.6}.section-head>span{font-size:9px;color:#839088;letter-spacing:1.4px}.dropzone{border:1px dashed #adc3b7;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:13px;padding:32px 15px;background:#f7faf6;color:#456d5e;cursor:pointer;position:relative}.dropzone:hover,.dropzone.dragover,.dropzone:focus-within{border-color:#244d42;background:#eef5ec}.dropzone strong{font-size:14px;color:#344d40}.dropzone>span{font-size:11px;color:#77867d}.dropzone input{position:absolute;width:100%;height:100%;opacity:0;cursor:pointer}.filename{font-size:12px;color:#637269;margin:12px 0 25px;overflow-wrap:anywhere}.field-label{display:block;font-size:12px;font-weight:650;margin-bottom:9px}select{width:100%;padding:12px;background:white;border:1px solid #dce2db;border-radius:6px;color:#344d40;margin-bottom:20px}button{border:0;border-radius:6px;padding:14px 18px;background:#244d42;color:white;font-size:13px;font-weight:650}#submit{width:100%;display:flex;justify-content:space-between}.hint{font-size:11px;line-height:1.7;color:#7c8880;margin:14px 0 0}.muted{font-size:12px;line-height:1.9;color:#718076;margin:0 0 18px}.process ol{padding:0;margin:0;list-style:none}.process li{display:flex;align-items:center;gap:13px;padding:12px 0;font-size:12px;border-bottom:1px solid #edf0eb}.step-dot{display:grid;place-items:center;width:25px;height:25px;background:#f2f4f0;border-radius:50%;color:#859087;font-size:10px}.step-state{margin-left:auto;font-size:10px;color:#9aa59b}.process li.running .step-dot{background:#244d42;color:white;animation:pulse 1.4s infinite}.process li.done .step-dot{background:#e5efe4;color:#244d42}.process li.done .step-state{color:#456d5e}.status{font-size:11px;line-height:1.7;margin:19px 0 0;color:#64756a}.error{padding:12px;background:#fff0ed;color:#9e3f31;border-radius:6px;font-size:12px;line-height:1.7}.result-head{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:64px 0 24px}.result-head .eyebrow{margin-bottom:10px}.result-head h2{font-size:24px;overflow-wrap:anywhere}.downloads{display:flex;gap:8px;flex-shrink:0}.secondary{background:white;color:#365a49;border:1px solid #cad7cd;font-size:11px}.metrics{display:grid;grid-template-columns:1.4fr 1fr 1fr;background:#244d42;color:white;border-radius:10px;padding:24px;margin-bottom:20px;gap:20px}.metrics span{display:block;font-size:11px;opacity:.7;margin-bottom:12px}.metrics strong{font-size:24px;overflow-wrap:anywhere}.cards{display:grid;grid-template-columns:1fr 1fr;gap:16px}.result-card{background:white;border:1px solid #dce2db;border-radius:9px;padding:24px;overflow-wrap:anywhere}.result-card h3{font-size:13px;color:#456d5e;margin:0 0 15px}.result-card p,.result-card li,.report-body{font-size:13px;line-height:1.9;white-space:pre-wrap}.result-card p{margin:0}.result-card ul{padding-left:18px;margin:0}.intermediates{margin-top:36px}details{border:1px solid #dce2db;border-radius:8px;background:white;margin:12px 0}summary{cursor:pointer;padding:20px;font-size:13px;font-weight:650}.report-body{padding:0 24px 24px;overflow-wrap:anywhere}.report-field{margin:12px 0;padding:12px;background:#f7f9f5;border-radius:6px}.report-field h4{font-size:12px;margin:0 0 8px;color:#526f5d}.report-field p{margin:0}.report-field ul{margin:0;padding-left:20px}.debate-card{border:1px solid #dce2db;border-radius:8px;padding:20px;margin:12px 0}.debate-card h3{margin-top:0;font-size:14px}.turn{border-left:2px solid #abc5b4;padding-left:14px;margin:18px 0}.turn strong{font-size:11px;color:#456d5e}.turn p{margin:5px 0}.evidence{font-size:11px;color:#77857a}.resolution{font-weight:650;font-size:12px}footer{display:flex;justify-content:space-between;gap:15px;color:#87918a;font-size:10px;border-top:1px solid #dce2db;margin-top:56px;padding:24px 0 32px}@keyframes pulse{50%{opacity:.5}}@media(prefers-reduced-motion:reduce){*{animation:none!important}}@media(max-width:720px){.top{padding:20px}.tag{display:none}main{padding:0 18px}.hero{padding-top:40px}.workspace,.cards{grid-template-columns:1fr}.panel{padding:22px}.result-head{align-items:flex-start;flex-direction:column}.metrics{grid-template-columns:1fr 1fr;padding:20px}.metrics>div:first-child{grid-column:1/-1}.metrics strong{font-size:21px}.desktop{display:none}footer{flex-direction:column}}
+</style>
