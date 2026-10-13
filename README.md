@@ -11,9 +11,8 @@ PDF → RAG / Evidence Retrieval → Summary Agent → Critical Reviewer
 
 ## 다운로드
 
-GitHub 저장소의 **Releases** 페이지에서 최신 버전의 `AI Paper Reviewer Setup x.x.x.exe`를 다운로드하세요. 현재 배포 파일명은 `AI Paper Reviewer Setup 1.0.0.exe`입니다.
-
-실제 저장소 URL과 Release 링크는 저장소 생성 및 첫 Release 게시 후 이 위치에 추가합니다. 아직 공개 Release가 게시되었다는 의미는 아닙니다.
+최신 Windows 설치 파일은 GitHub Releases에서 다운로드할 수 있습니다.
+[Latest Release](https://github.com/soonhoi/ai-paper-reviewer/releases/latest)
 
 ## 주요 기능
 
